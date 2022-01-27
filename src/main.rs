@@ -51,6 +51,8 @@ fn main() -> anyhow::Result<()> {
             println!("{:#?}", record);
         }
         println!();
+
+        fs::remove_file(entry.path())?;
     }
 
     Ok(())
