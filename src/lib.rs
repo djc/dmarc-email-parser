@@ -42,11 +42,16 @@ pub fn mail_to_report(bytes: &[u8]) -> anyhow::Result<Feedback> {
             let mut decoder = flate2::read::GzDecoder::new(reader);
             decoder.read_to_end(&mut buf)?;
         }
-        _ => {
+        type_str => {
+            if type_str.starts_with("text/") {
+                let s = String::from_utf8(body)?;
+                println!("{s}");
+            }
+
             return Err(Error::msg(format!(
                 "unsupported content type: {}",
                 ctype.mimetype
-            )))
+            )));
         }
     }
 
