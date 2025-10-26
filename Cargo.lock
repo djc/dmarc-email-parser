@@ -173,7 +173,6 @@ dependencies = [
  "dmarc_aggregate_parser",
  "flate2",
  "mailparse",
- "thiserror",
  "time 0.3.44",
  "zip",
 ]
