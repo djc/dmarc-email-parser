@@ -2,7 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 
 use clap::Parser;
-use dmarc_aggregate_parser::aggregate_report::DMARCResultType;
+use dmarc_email_parser::DmarcResult;
 use time::{format_description, OffsetDateTime};
 
 fn main() -> anyhow::Result<()> {
@@ -13,16 +13,14 @@ fn main() -> anyhow::Result<()> {
         let feedback = dmarc_email_parser::mail_to_report(&raw)?;
 
         let mut failed = Vec::new();
-        for record in feedback.record {
-            #[allow(clippy::if_same_then_else)]
-            if let Some(DMARCResultType::fail) = record.row.policy_evaluated.dkim {
-                failed.push(record);
-            } else if let Some(DMARCResultType::fail) = record.row.policy_evaluated.spf {
+        for record in feedback.records {
+            let evaluated = &record.row.policy_evaluated;
+            if evaluated.dkim == DmarcResult::Fail || evaluated.spf == DmarcResult::Fail {
                 failed.push(record);
             }
         }
 
-        if failed.is_empty() && feedback.report_metadata.error.is_none() {
+        if failed.is_empty() && feedback.report_metadata.errors.is_empty() {
             fs::remove_file(entry.path())?;
             continue;
         }
@@ -41,10 +39,8 @@ fn main() -> anyhow::Result<()> {
             end.format(&format)?,
         );
 
-        if let Some(errors) = &feedback.report_metadata.error {
-            for error in errors {
-                println!("error: {}", error);
-            }
+        for error in feedback.report_metadata.errors {
+            println!("error: {}", error);
         }
 
         for record in failed {
