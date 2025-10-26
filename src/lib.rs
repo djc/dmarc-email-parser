@@ -1,4 +1,7 @@
-use std::io::{self, Read};
+use std::{
+    io::{self, Read},
+    net::IpAddr,
+};
 
 use anyhow::Error;
 use instant_xml::FromXml;
@@ -109,7 +112,7 @@ pub struct Record {
 #[derive(Debug, FromXml)]
 #[xml(rename = "row")]
 pub struct Row {
-    pub source_ip: String,
+    pub source_ip: IpAddr,
     pub count: u32,
     pub policy_evaluated: PolicyEvaluated,
 }
