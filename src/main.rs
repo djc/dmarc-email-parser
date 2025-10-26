@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 use clap::Parser;
 use dmarc_email_parser::DmarcResult;
-use time::{format_description, OffsetDateTime};
+use time::{OffsetDateTime, format_description};
 
 fn main() -> anyhow::Result<()> {
     let opts = Opts::parse();
