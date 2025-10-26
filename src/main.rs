@@ -21,7 +21,9 @@ fn main() -> anyhow::Result<()> {
         }
 
         if failed.is_empty() && feedback.report_metadata.errors.is_empty() {
-            fs::remove_file(entry.path())?;
+            if opts.remove {
+                fs::remove_file(entry.path())?;
+            }
             continue;
         }
 
@@ -48,7 +50,9 @@ fn main() -> anyhow::Result<()> {
         }
         println!();
 
-        fs::remove_file(entry.path())?;
+        if opts.remove {
+            fs::remove_file(entry.path())?;
+        }
     }
 
     Ok(())
@@ -57,4 +61,6 @@ fn main() -> anyhow::Result<()> {
 #[derive(Debug, Parser)]
 struct Opts {
     path: PathBuf,
+    #[clap(long, default_value = "false")]
+    remove: bool,
 }
