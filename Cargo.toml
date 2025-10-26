@@ -8,6 +8,6 @@ anyhow = "1.0.53"
 clap = { version = "4", features = ["derive"] }
 dmarc_aggregate_parser = "0.1.3"
 flate2 = "1.0.22"
-mailparse = "0.13.7"
+mailparse = "0.16"
 time = { version = "0.3.6", features = ["formatting"] }
 zip = { version = "6", default-features = false, features = ["deflate"] }
