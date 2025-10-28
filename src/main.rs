@@ -30,7 +30,26 @@ fn main() -> anyhow::Result<()> {
         }
 
         for record in feedback.records {
-            println!("{:#?}", record);
+            println!(
+                "{} messages from {}",
+                record.row.count, record.row.source_ip
+            );
+            println!(
+                "  disposition: {:?}, DKIM: {:?}, SPF: {:?}",
+                record.row.policy_evaluated.disposition,
+                record.row.policy_evaluated.dkim,
+                record.row.policy_evaluated.spf
+            );
+
+            match record.auth_results.dkim {
+                Some(dkim) => println!("  DKIM: {:?} ({})", dkim.result, dkim.domain),
+                None => println!("  DKIM: no results"),
+            }
+
+            match record.auth_results.spf {
+                Some(spf) => println!("  SPF: {:?} ({})", spf.result, spf.domain),
+                None => println!("  SPF: no results"),
+            }
         }
         println!();
 
