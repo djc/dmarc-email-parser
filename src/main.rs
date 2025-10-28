@@ -2,7 +2,6 @@ use std::fs;
 use std::path::PathBuf;
 
 use clap::Parser;
-use dmarc_email_parser::DmarcResult;
 use time::{OffsetDateTime, format_description};
 
 fn main() -> anyhow::Result<()> {
@@ -13,21 +12,6 @@ fn main() -> anyhow::Result<()> {
         let entry = entry?;
         let raw = fs::read(entry.path())?;
         let feedback = dmarc_email_parser::mail_to_report(&raw)?;
-
-        let mut failed = Vec::new();
-        for record in feedback.records {
-            let evaluated = &record.row.policy_evaluated;
-            if evaluated.dkim == DmarcResult::Fail || evaluated.spf == DmarcResult::Fail {
-                failed.push(record);
-            }
-        }
-
-        if failed.is_empty() && feedback.report_metadata.errors.is_empty() {
-            if opts.remove {
-                fs::remove_file(entry.path())?;
-            }
-            continue;
-        }
 
         let start =
             OffsetDateTime::from_unix_timestamp(feedback.report_metadata.date_range.begin as i64)?;
@@ -45,7 +29,7 @@ fn main() -> anyhow::Result<()> {
             println!("error: {}", error);
         }
 
-        for record in failed {
+        for record in feedback.records {
             println!("{:#?}", record);
         }
         println!();
