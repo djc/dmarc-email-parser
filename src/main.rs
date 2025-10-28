@@ -7,6 +7,8 @@ use time::{OffsetDateTime, format_description};
 
 fn main() -> anyhow::Result<()> {
     let opts = Opts::parse();
+    let format = format_description::parse("[month repr:short] [day], [hour]:[minute]").unwrap();
+
     for entry in fs::read_dir(&opts.path).unwrap() {
         let entry = entry?;
         let raw = fs::read(entry.path())?;
@@ -27,8 +29,6 @@ fn main() -> anyhow::Result<()> {
             continue;
         }
 
-        let format =
-            format_description::parse("[month repr:short] [day], [hour]:[minute]").unwrap();
         let start =
             OffsetDateTime::from_unix_timestamp(feedback.report_metadata.date_range.begin as i64)?;
         let end =
