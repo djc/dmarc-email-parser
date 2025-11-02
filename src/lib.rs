@@ -5,24 +5,35 @@ use std::{
 
 use anyhow::Error;
 use instant_xml::FromXml;
+use mailparse::ParsedContentType;
 
 pub fn mail_to_report(bytes: &[u8]) -> anyhow::Result<Feedback> {
     let mail = mailparse::parse_mail(bytes)?;
+    if mail.subparts.is_empty() {
+        return process_part(&mail.ctype, mail.get_body_raw()?);
+    }
 
-    let (ctype, body) = match mail.subparts.is_empty() {
-        true => (&mail.ctype, mail.get_body_raw()),
-        false => mail
-            .subparts
-            .iter()
-            .filter_map(|part| match part.ctype.mimetype.as_ref() {
-                "multipart/related" => None,
-                _ => Some((&part.ctype, part.get_body_raw())),
-            })
-            .next()
-            .ok_or(Error::msg("no content part found"))?,
-    };
+    for part in mail.subparts {
+        if part.ctype.mimetype == "multipart/related" {
+            continue;
+        }
 
-    let body = body?;
+        match process_part(&part.ctype, part.get_body_raw()?) {
+            Ok(feedback) => return Ok(feedback),
+            Err(err) => {
+                println!(
+                    "skipping part due to error (type = {}): {err}",
+                    part.ctype.mimetype.as_str()
+                );
+                continue;
+            }
+        }
+    }
+
+    Err(anyhow::Error::msg("no suitable part found"))
+}
+
+fn process_part(ctype: &ParsedContentType, body: Vec<u8>) -> anyhow::Result<Feedback> {
     let reader = io::Cursor::new(&body);
     let mut buf = Vec::new();
     match ctype.mimetype.as_str() {
