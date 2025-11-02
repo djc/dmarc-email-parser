@@ -102,7 +102,7 @@ pub struct PolicyPublished {
     /// Overall policy
     pub p: Disposition,
     /// Subdomain policy
-    pub sp: Disposition,
+    pub sp: Option<Disposition>,
     pub pct: u8,
     /// Failure reporting options
     pub fo: Option<String>,
