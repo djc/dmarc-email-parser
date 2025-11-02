@@ -14,7 +14,7 @@ pub fn mail_to_report(bytes: &[u8]) -> anyhow::Result<Feedback> {
     }
 
     for part in mail.subparts {
-        if part.ctype.mimetype == "multipart/related" {
+        if part.ctype.mimetype == "multipart/related" || part.ctype.mimetype == "text/html" {
             continue;
         }
 
