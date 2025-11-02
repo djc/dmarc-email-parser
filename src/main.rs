@@ -12,9 +12,32 @@ async fn main() -> anyhow::Result<()> {
     let resolver = TokioResolver::builder_tokio()?.build();
 
     for entry in fs::read_dir(&opts.path).unwrap() {
-        let entry = entry?;
-        let raw = fs::read(entry.path())?;
-        let feedback = dmarc_email_parser::mail_to_report(&raw)?;
+        let entry = match entry {
+            Ok(entry) => entry,
+            Err(error) => {
+                println!("failed to read entry: {error:#?}");
+                continue;
+            }
+        };
+
+        let raw = match fs::read(entry.path()) {
+            Ok(raw) => raw,
+            Err(error) => {
+                println!("failed to read file {:?}: {error:#?}", entry.path());
+                continue;
+            }
+        };
+
+        let feedback = match dmarc_email_parser::mail_to_report(&raw) {
+            Ok(feedback) => feedback,
+            Err(error) => {
+                println!(
+                    "failed to parse DMARC report from file {:?}: {error:#?}",
+                    entry.path()
+                );
+                continue;
+            }
+        };
 
         let start =
             OffsetDateTime::from_unix_timestamp(feedback.report_metadata.date_range.begin as i64)?;
