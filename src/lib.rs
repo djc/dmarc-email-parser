@@ -37,6 +37,7 @@ fn process_part(ctype: &ParsedContentType, body: Vec<u8>) -> anyhow::Result<Feed
     let reader = io::Cursor::new(&body);
     let mut buf = Vec::new();
     match ctype.mimetype.as_str() {
+        "text/plain" => buf = body,
         "application/zip" => {
             let mut archive = zip::ZipArchive::new(reader)?;
             if archive.len() > 1 {
