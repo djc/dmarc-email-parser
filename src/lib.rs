@@ -165,6 +165,8 @@ pub enum DmarcResult {
 #[derive(Debug, FromXml)]
 #[xml(rename = "identifiers")]
 pub struct Identifiers {
+    pub envelope_to: Option<String>,
+    pub envelope_from: Option<String>,
     pub header_from: String,
 }
 
