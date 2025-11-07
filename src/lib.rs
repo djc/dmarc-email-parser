@@ -26,6 +26,7 @@ pub fn mail_to_report(bytes: &[u8]) -> anyhow::Result<Feedback> {
     let reader = io::Cursor::new(&body);
     let mut buf = Vec::new();
     match ctype.mimetype.as_str() {
+        "text/plain" => buf = body,
         "application/zip" => {
             let mut archive = zip::ZipArchive::new(reader)?;
             if archive.len() > 1 {
