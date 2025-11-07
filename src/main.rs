@@ -42,8 +42,8 @@ async fn main() -> anyhow::Result<()> {
             };
 
             println!(
-                "{} messages from {} ({host:?})",
-                record.row.count, record.row.source_ip
+                "{} messages from {} via {} ({host})",
+                record.row.count, record.identifiers.header_from, record.row.source_ip
             );
             println!(
                 "  disposition: {:?}, DKIM: {:?}, SPF: {:?}",
