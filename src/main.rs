@@ -28,6 +28,10 @@ async fn main() -> anyhow::Result<()> {
             }
         };
 
+        if let Some(filename) = entry.path().file_name() {
+            println!("reading from file: {}", filename.display());
+        }
+
         let feedback = match dmarc_email_parser::mail_to_report(&raw) {
             Ok(feedback) => feedback,
             Err(error) => {
