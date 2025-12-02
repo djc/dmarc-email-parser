@@ -564,9 +564,9 @@ dependencies = [
 
 [[package]]
 name = "instant-xml"
-version = "0.5.2"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "17341e0f2bde83163f6996ba16a959e29f135a8fb2bb58427d3d5b1fa56d932c"
+checksum = "e697f8b6f727bffca9f598fd94a4bba36096800cd7e563ff0d5ab3edcc36bcc2"
 dependencies = [
  "instant-xml-macros",
  "thiserror",
@@ -575,9 +575,9 @@ dependencies = [
 
 [[package]]
 name = "instant-xml-macros"
-version = "0.5.2"
+version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "89260b3d623ac90268850f1cec28fa519327f2c3e9e1fa0bae9823fd436066ab"
+checksum = "7af20da3bd5eadb454a00c1965765648abd0e4c17dac72a8290c09e4c5657c8d"
 dependencies = [
  "heck",
  "proc-macro2",
