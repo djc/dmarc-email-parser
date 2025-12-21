@@ -50,6 +50,18 @@ fn process_part(ctype: &ParsedContentType, body: Vec<u8>) -> anyhow::Result<Feed
             let mut file = archive.by_index(0)?;
             file.read_to_end(&mut buf)?;
         }
+        "application/octet-stream" => match ctype.params.get("name") {
+            Some(name) if name.ends_with(".gz") => {
+                let mut decoder = flate2::read::GzDecoder::new(reader);
+                decoder.read_to_end(&mut buf)?;
+            }
+            _ => {
+                return Err(Error::msg(format!(
+                    "unsupported octet-stream content with name: {:?}",
+                    ctype.params.get("name")
+                )));
+            }
+        },
         "application/gzip" => {
             let mut decoder = flate2::read::GzDecoder::new(reader);
             decoder.read_to_end(&mut buf)?;
