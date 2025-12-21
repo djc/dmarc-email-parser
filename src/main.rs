@@ -11,24 +11,28 @@ async fn main() -> anyhow::Result<()> {
     let format = format_description::parse("[month repr:short] [day], [hour]:[minute]").unwrap();
     let resolver = TokioResolver::builder_tokio()?.build();
 
+    let mut files = Vec::new();
     for entry in fs::read_dir(&opts.path).unwrap() {
-        let entry = match entry {
-            Ok(entry) => entry,
+        match entry {
+            Ok(entry) => files.push(entry.path()),
             Err(error) => {
                 println!("failed to read entry: {error:#?}");
                 continue;
             }
-        };
+        }
+    }
 
-        let raw = match fs::read(entry.path()) {
+    files.sort_unstable();
+    for path in files.into_iter().rev() {
+        let raw = match fs::read(&path) {
             Ok(raw) => raw,
             Err(error) => {
-                println!("failed to read file {:?}: {error:#?}", entry.path());
+                println!("failed to read file {}: {error:#?}", path.display());
                 continue;
             }
         };
 
-        if let Some(filename) = entry.path().file_name() {
+        if let Some(filename) = path.file_name() {
             println!("reading from file: {}", filename.display());
         }
 
@@ -36,8 +40,8 @@ async fn main() -> anyhow::Result<()> {
             Ok(feedback) => feedback,
             Err(error) => {
                 println!(
-                    "failed to parse DMARC report from file {:?}: {error:#?}",
-                    entry.path()
+                    "failed to parse DMARC report from file {}: {error:#?}",
+                    path.display()
                 );
                 continue;
             }
@@ -92,7 +96,7 @@ async fn main() -> anyhow::Result<()> {
         println!();
 
         if opts.remove {
-            fs::remove_file(entry.path())?;
+            fs::remove_file(path)?;
         }
     }
 
