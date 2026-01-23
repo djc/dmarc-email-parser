@@ -80,13 +80,20 @@ fn process_part(ctype: &ParsedContentType, body: Vec<u8>) -> anyhow::Result<Feed
     }
 
     let s = String::from_utf8(buf)?;
-    Ok(instant_xml::from_str(&s)?)
+    match instant_xml::from_str(&s) {
+        Ok(feedback) => Ok(feedback),
+        Err(err) => {
+            println!("failed to parse XML: {err}");
+            println!("XML content:\n{s}");
+            Err(err.into())
+        }
+    }
 }
 
 #[derive(Debug, FromXml)]
 #[xml(rename = "feedback")]
 pub struct Feedback {
-    pub version: String,
+    pub version: Option<String>,
     pub report_metadata: ReportMetadata,
     pub policy_published: PolicyPublished,
     pub records: Vec<Record>,
